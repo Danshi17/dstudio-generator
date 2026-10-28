@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>newResources — Text Effect Studio v2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="brand"><b>newResources</b><span>Text Effect Studio v2</span></div>
+  <div class="actions">
+    <button id="newBtn">Nuevo</button>
+    <label class="button">Importar<input id="importInput" type="file" accept=".nreffect,.json" hidden></label>
+    <button id="exportProject">Exportar proyecto</button>
+    <button id="exportYaml" class="primary">Exportar YAML</button>
+  </div>
+</header>
+
+<main>
+  <aside class="left">
+    <section>
+      <h3>Efecto</h3>
+      <label>Nombre<input id="name" value="Custom Particles"></label>
+      <label>ID<input id="id" value="custom_particles"></label>
+      <label>Marker
+        <div class="row">
+          <input id="markerColor" type="color" value="#540000">
+          <input id="marker" value="#540000">
+          <button id="markerRnd">↻</button>
+        </div>
+      </label>
+      <div id="markerStatus" class="ok">✓ Marker compatible</div>
+      <label>Texto de prueba<input id="previewText" value="CUSTOM PARTICLES"></label>
+      <label>Target
+        <select id="target">
+          <option>1.18.2-1.20.1</option>
+          <option>1.20.2-1.20.4</option>
+          <option>1.20.5-1.21.5</option>
+          <option selected>1.21.6-1.21.11</option>
+        </select>
+      </label>
+    </section>
+
+    <section>
+      <div class="section-head"><h3>Capas</h3><button id="clear" class="link danger">Limpiar</button></div>
+      <div id="layers"></div>
+    </section>
+
+    <section>
+      <h3>Añadir capa</h3>
+      <div id="palette" class="palette"></div>
+    </section>
+  </aside>
+
+  <section class="center">
+    <div class="toolbar">
+      <div>
+        <button class="bg active" data-bg="dark">Oscuro</button>
+        <button class="bg" data-bg="light">Claro</button>
+        <button class="bg" data-bg="game">Minecraft</button>
+      </div>
+      <button id="pause">Pausar</button>
+    </div>
+    <div id="stage" class="stage dark">
+      <canvas id="canvas"></canvas>
+      <span class="badge">LIVE PREVIEW</span>
+    </div>
+    <div id="fbBar" class="fbbar">
+      <small>SIN TEXTUREPACK · así lo verán los jugadores sin el pack (fallback)</small>
+      <div id="fbPreview" class="fbpreview"></div>
+    </div>
+    <div class="usage">
+      <div><small>MiniMessage</small><code id="mini"></code></div>
+      <div><small>Legacy</small><code id="legacy"></code></div>
+      <button id="copyMini">Copiar</button>
+    </div>
+  </section>
+
+  <aside class="right">
+    <section>
+      <div class="section-head"><h3>Propiedades</h3><span id="selectedName">—</span></div>
+      <div id="props" class="muted">Selecciona una capa.</div>
+    </section>
+
+    <section id="particleDesigner" class="hidden">
+      <h3>Particle Designer</h3>
+      <p class="hint">Dibuja tu partícula. Cada cuadro encendido forma el sprite que el shader repite alrededor del texto.</p>
+      <div class="particle-tools">
+        <button id="maskClear">Vaciar</button>
+        <button id="maskInvert">Invertir</button>
+        <button id="maskStar">Estrella</button>
+        <button id="maskSpark">Spark</button>
+        <button id="maskHeart">Corazón</button>
+      </div>
+      <div id="pixelGrid" class="pixel-grid"></div>
+    </section>
+
+    <section>
+      <div class="section-head"><h3>Fallback sin texturepack</h3><label class="chk"><input type="checkbox" id="fbEnabled" checked>Activo</label></div>
+      <div id="fbBody">
+        <p class="hint">Para jugadores que no tienen el pack: mismo color y misma velocidad, pero con gradiente hex normal (MiniMessage / legacy), sin shader.</p>
+        <div class="fbopts">
+          <label class="chk"><input type="checkbox" id="fbBold" checked>Negrita</label>
+          <label class="chk"><input type="checkbox" id="fbItalic">Cursiva</label>
+          <label class="chk"><input type="checkbox" id="fbUnder">Subrayado</label>
+          <label class="chk"><input type="checkbox" id="fbStrike">Tachado</label>
+        </div>
+        <label class="chk"><input type="checkbox" id="fbAnimate">Animar el fallback (frames con el mismo ciclo)</label>
+        <label id="fbFramesRow" class="hidden">Frames<input id="fbFrames" type="number" min="4" max="60" value="16"></label>
+        <label class="chk"><input type="checkbox" id="fbCustom">Colores propios (si no, usa los de la capa Gradient/Rainbow)</label>
+        <div id="fbColors" class="colors"></div>
+        <label>MiniMessage<textarea id="fbMini" class="small" spellcheck="false" readonly></textarea></label>
+        <label>Legacy<textarea id="fbLegacy" class="small" spellcheck="false" readonly></textarea></label>
+        <div id="fbInfo" class="hint"></div>
+        <div class="row">
+          <button id="copyFbMini" type="button">Copiar MiniMessage</button>
+          <button id="copyFbLegacy" type="button">Copiar Legacy</button>
+        </div>
+        <div class="row" style="margin-top:7px"><button id="exportFb" type="button">Exportar fallback</button></div>
+      </div>
+    </section>
+
+    <section>
+      <h3>YAML</h3>
+      <textarea id="output" spellcheck="false"></textarea>
+      <div class="row">
+        <button id="copyYaml">Copiar YAML</button>
+        <button id="exportGlsl">Exportar operation GLSL</button>
+      </div>
+    </section>
+  </aside>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
